@@ -371,10 +371,6 @@ def main():  # *
             run = False
 
 
-def options():
-    pass
-
-
 def quit_game():
     pygame.quit()
     sys.exit()
@@ -382,32 +378,32 @@ def quit_game():
 
 def main_menu():
     clock = pygame.time.Clock()
-    buttons = []
     button_width = 200
     button_height = 50
     button_left = win.get_width() // 2 - button_width // 2
     button_top = 200
     button_play = pygame.Rect(button_left, button_top, button_width, button_height)
-    button_options = pygame.Rect(button_left, button_top + 100, button_width, button_height)
     button_exit = pygame.Rect(button_left, button_top + 200, button_width, button_height)
-    buttons.append((button_play, (0, 0, 155)))
-    # buttons.append((button_options, (0, 155, 0)))
-    buttons.append((button_exit, (155, 0, 0)))
 
     while True:
         win.fill(BLACK)
         text_play = font_small.render("Play", True, WHITE)
-        # text_options = font_small.render("Options", True, WHITE)
         text_exit = font_small.render("Exit", True, WHITE)
         mx, my = pygame.mouse.get_pos()
+        play_color = (0, 0, 155)
+        exit_color = (155, 0, 0)
+        if button_play.collidepoint(mx, my):
+            play_color = BLUE
+        elif button_exit.collidepoint(mx, my):
+            exit_color = RED
+
+        buttons = [(button_play, play_color), (button_exit, exit_color)]
 
         for button in buttons:
             pygame.draw.rect(win, button[1], button[0])
 
         win.blit(text_play,
                  text_play.get_rect(center=(button_left + button_width // 2, button_top + button_height // 2)))
-        # win.blit(text_options, text_options.get_rect(
-        #    center=(button_left + button_width // 2, button_top + 100 + button_height // 2)))
         win.blit(text_exit,
                  text_exit.get_rect(center=(button_left + button_width // 2, button_top + 200 + button_height // 2)))
 
@@ -417,8 +413,6 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_play.collidepoint(mx, my):
                     main()
-                if button_options.collidepoint(mx, my):
-                    options()
                 if button_exit.collidepoint(mx, my):
                     quit_game()
             if event.type == pygame.KEYDOWN:
@@ -426,8 +420,6 @@ def main_menu():
                     quit_game()
                 if event.key == pygame.K_g:
                     main()
-                if event.key == pygame.K_o:
-                    options()
         pygame.display.update()
         clock.tick(60)
 

@@ -1,7 +1,10 @@
+import os
 import sys
-
 import pygame
 import random
+from pygame.locals import *
+
+os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
 
 pygame.font.init()
 
@@ -278,7 +281,7 @@ def draw_window(surface, grid, score=0):
                              (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
 
     draw_grid(surface, grid)
-    pygame.draw.rect(surface, WHITE, (top_left_x-3, top_left_y-3, play_width+6, play_height+6), 4)
+    pygame.draw.rect(surface, WHITE, (top_left_x - 3, top_left_y - 3, play_width + 6, play_height + 6), 4)
 
 
 def main():  # *
@@ -334,12 +337,26 @@ def main():  # *
                     current_piece.rotation += 1
                     if not (valid_space(current_piece, grid)):
                         current_piece.rotation -= 1
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_DOWN]:
-            if pygame.time.get_ticks() - move_timer > MOVE_DELAY:
-                current_piece.y += 1
-                if not valid_space(current_piece, grid):
+                if event.key == pygame.K_DOWN:
+                    while valid_space(current_piece, grid):
+                        current_piece.y += 1
+                    current_piece.y -= 1
+            elif event.type == JOYHATMOTION:
+                if event.value == (-1, 0):  # left
+                    current_piece.x -= 1
+                    if not (valid_space(current_piece, grid)):
+                        current_piece.x += 1
+                elif event.value == (1, 0):  # right
+                    current_piece.x += 1
+                    if not (valid_space(current_piece, grid)):
+                        current_piece.x -= 1
+                elif event.value == (0, 1):  # up
+                    current_piece.rotation += 1
+                    if not (valid_space(current_piece, grid)):
+                        current_piece.rotation -= 1
+                elif event.value == (0, -1):  # down
+                    while valid_space(current_piece, grid):
+                        current_piece.y += 1
                     current_piece.y -= 1
 
         shape_pos = convert_shape_format(current_piece)
@@ -384,6 +401,10 @@ def main_menu():
     button_top = 200
     button_play = pygame.Rect(button_left, button_top, button_width, button_height)
     button_exit = pygame.Rect(button_left, button_top + 200, button_width, button_height)
+    pygame.joystick.init()
+    if pygame.joystick.get_count() > 0:
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
 
     while True:
         win.fill(BLACK)

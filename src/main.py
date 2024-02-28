@@ -1,10 +1,7 @@
-import os
 import sys
 import pygame
 import random
 from pygame.locals import *
-
-os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
 
 pygame.font.init()
 

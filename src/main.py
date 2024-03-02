@@ -136,10 +136,7 @@ tetrimino_T = [['.....',
                 '.....']]
 
 shapes = [tetrimino_S, tetrimino_Z, tetrimino_I, tetrimino_O, tetrimino_J, tetrimino_L, tetrimino_T]
-shape_colors = [(255, 0, 0), (0, 255, 0), (0, 255, 255), (255, 255, 0), (255, 165, 20), (20, 20, 255), (128, 0, 128)]
-
-
-# index 0 - 6 represent shape
+shape_colors = [(255, 0, 0), (0, 255, 0), (0, 255, 255), (255, 255, 0), (255, 165, 20), (80, 60, 205), (128, 0, 128)]
 
 
 class Piece(object):  # *
@@ -268,7 +265,6 @@ def draw_window(surface, grid, score=0):
 
     pygame.font.init()
 
-    # current score
     label = font_small.render('Score: ' + str(score), 1, WHITE)
 
     sx = top_left_x + play_width + 50

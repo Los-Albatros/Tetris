@@ -19,6 +19,7 @@ win = pygame.display.set_mode((s_width, s_height))
 pygame.display.set_caption('Tetris')
 
 WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
@@ -27,7 +28,10 @@ BLACK = (0, 0, 0)
 font_large = pygame.font.Font(None, 70)
 font_small = pygame.font.Font(None, 36)
 
-# SHAPE FORMATS
+pygame.joystick.init()
+if pygame.joystick.get_count() > 0:
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
 
 tetrimino_S = [['.....',
                 '.....',
@@ -281,7 +285,32 @@ def draw_window(surface, grid, score=0):
     pygame.draw.rect(surface, WHITE, (top_left_x - 3, top_left_y - 3, play_width + 6, play_height + 6), 4)
 
 
-def main():  # *
+def pause():
+    text_pause = font_large.render("Pause", True, YELLOW)
+    rect = pygame.Rect(10, 10, text_pause.get_width(), text_pause.get_height())
+    win.blit(text_pause, rect)
+    pygame.display.update()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit_game()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    main_menu()
+                if event.key == pygame.K_p:
+                    pygame.draw.rect(win, BLACK, rect)
+                    pygame.display.update()
+                    return
+            elif event.type == JOYBUTTONDOWN:
+                if event.button == 7:
+                    pygame.draw.rect(win, BLACK, rect)
+                    pygame.display.update()
+                    return
+                elif event.button == 1:
+                    main_menu()
+
+
+def game():  # *
     locked_positions = {}
 
     change_piece = False
@@ -322,6 +351,8 @@ def main():  # *
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     main_menu()
+                if event.key == pygame.K_p:
+                    pause()
                 if event.key == pygame.K_LEFT:
                     current_piece.x -= 1
                     if not (valid_space(current_piece, grid)):
@@ -355,6 +386,9 @@ def main():  # *
                     while valid_space(current_piece, grid):
                         current_piece.y += 1
                     current_piece.y -= 1
+            elif event.type == JOYBUTTONDOWN:
+                if event.button == 7:
+                    pause()
 
         shape_pos = convert_shape_format(current_piece)
 
@@ -391,6 +425,7 @@ def quit_game():
 
 
 def main_menu():
+    global joystick
     clock = pygame.time.Clock()
     button_width = 200
     button_height = 50
@@ -398,10 +433,6 @@ def main_menu():
     button_top = 200
     button_play = pygame.Rect(button_left, button_top, button_width, button_height)
     button_exit = pygame.Rect(button_left, button_top + 200, button_width, button_height)
-    pygame.joystick.init()
-    if pygame.joystick.get_count() > 0:
-        joystick = pygame.joystick.Joystick(0)
-        joystick.init()
 
     while True:
         win.fill(BLACK)
@@ -430,14 +461,19 @@ def main_menu():
                 quit_game()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_play.collidepoint(mx, my):
-                    main()
+                    game()
                 if button_exit.collidepoint(mx, my):
                     quit_game()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     quit_game()
                 if event.key == pygame.K_g:
-                    main()
+                    game()
+            elif event.type == JOYBUTTONDOWN:
+                if event.button == 7:
+                    game()
+                elif event.button == 1:
+                    quit_game()
         pygame.display.update()
         clock.tick(60)
 
